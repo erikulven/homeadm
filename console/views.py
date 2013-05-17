@@ -28,6 +28,20 @@ def index(request, params={}):
                               context_instance=RequestContext(request))
 
 
+def enter(request, params={}):
+    return render_to_response('register.html', params,
+                              context_instance=RequestContext(request))
+
+def register(request, params={}):
+    measure = int(request.POST['measure'])
+        
+    p = Power()
+    p.level = measure
+    if 'description' in request.POST:
+        p.description = request.POST['description']
+    p.save()
+    return HttpResponseRedirect('/')
+
 def search_powers(q, params):
     res = {}
     fltr = Power.objects.order_by('-updated_at')

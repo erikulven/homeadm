@@ -12,18 +12,12 @@
 {% endblock %}
 
 {% block sidebar %}
-<div class="alert alert-block alert-info">
-SIDEBAR HERE...
+<div class="pull-left span11">
+{% include "register.html" %}
 </div>
-       
-    
-    
 {% endblock %}
 
 {% block content %}
-  <div>
-
-
 
    <div class="pager">
         <ul>
@@ -37,11 +31,23 @@ SIDEBAR HERE...
             {% endif %}
         </ul>
     </div>
- 
 
-  <div class="row-fluid">
-
-
-
-  </div>
+<table class="table table-bordered table-hover table-condensed">
+  <thead>
+    <tr>
+      <th class="span2">Dato</th>
+      <th class="span2">Verdi</th>
+      <th class="span8">Kommentar</th>
+    </tr>
+  </thead>
+  <tbody>
+      {% for item in results.powers %}
+        <tr>
+            <td nowrap="nowrap">{{ item.updated_at }}</td>
+            <td nowrap="nowrap">{{ item.level }}</td>
+            <td >{{ item.description }}</td>
+        </tr>
+       {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

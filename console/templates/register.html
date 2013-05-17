@@ -1,0 +1,14 @@
+{% block content %}
+
+<h6>Legg inn m&aring;leverdi</h6>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form class="well form-horizontal span12" action="/register/" method="post">
+    {% csrf_token %}
+    <input name="measure" type="text" class="span11" placeholder="Måleverdi..." value="0">
+    <textarea class="span11" name="description" rows="5" placeholder="Kommentar"></textarea>
+    <button type="submit" class="btn btn-primary pull-left">Registrer</button>
+</form>
+
+{% endblock %}
