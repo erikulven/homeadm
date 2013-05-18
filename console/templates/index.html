@@ -1,23 +1,33 @@
 {% extends "base.html" %}
 
 {% block menu %}
-  <form class="form-search navbar-search pull-right" action="/console/index/?o={{ owner.id }}" method="post">
-        {% csrf_token %}
-        <div class="input-append">
-          <input tabindex="0" type="text" name="query" class="span2 search-query" placeholder="S&oslash;k her...…" value="{{ query }}"/>
-          <button type="submit" class="btn"><i class="icon-search"></i></button>
-       </div>
-   </form>
-
 {% endblock %}
 
 {% block sidebar %}
-<div class="pull-left span11">
-{% include "register.html" %}
-</div>
+{% include "register_form.html" %}
 {% endblock %}
 
 {% block content %}
+
+<table class="table table-bordered table-hover table-condensed">
+  <thead>
+    <tr>
+      <th class="span2">Dato</th>
+      <th class="span2">Verdi</th>
+      <th class="span8">Kommentar</th>
+    </tr>
+  </thead>
+  <tbody>
+      {% for item in results.powers %}
+        <tr>
+            <td nowrap="nowrap"><a href="/edit/{{ item.id }}/">{{ item.created_at }}</a></td>
+            <td nowrap="nowrap"><a href="/edit/{{ item.id }}/">{{ item.level }}</a></td>
+            <td >{{ item.description }}</td>
+        </tr>
+       {% endfor %}
+  </tbody>
+</table>
+
 
    <div class="pager">
         <ul>
@@ -32,22 +42,4 @@
         </ul>
     </div>
 
-<table class="table table-bordered table-hover table-condensed">
-  <thead>
-    <tr>
-      <th class="span2">Dato</th>
-      <th class="span2">Verdi</th>
-      <th class="span8">Kommentar</th>
-    </tr>
-  </thead>
-  <tbody>
-      {% for item in results.powers %}
-        <tr>
-            <td nowrap="nowrap">{{ item.updated_at }}</td>
-            <td nowrap="nowrap">{{ item.level }}</td>
-            <td >{{ item.description }}</td>
-        </tr>
-       {% endfor %}
-  </tbody>
-</table>
 {% endblock %}

@@ -1,10 +1,11 @@
 from console.models import Power
+from console.forms import PowerForm
 
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.utils.encoding import smart_unicode
 import logging
@@ -14,40 +15,64 @@ logger = logging.getLogger(__name__)
 BATCH_SIZE = 48
 
 # Create your views here.
-
+@login_required(login_url='/accounts/login/')
 def index(request, params={}):
-    q = parse_param(request, 'query')
     rparams = dict(params)
     rparams['page'] = parse_param(request, 'page')
-    rparams['query'] = q
     rparams['sender'] = 'index'
-    results = search_powers(q, {'page': rparams['page']})
+    results = search_powers(None, {'page': rparams['page']})
     rparams['results'] = results
-    logger.debug("Got index request here... query=" + q)
+    rparams['form'] = PowerForm()
     return render_to_response('index.html', rparams,
                               context_instance=RequestContext(request))
-
-
-def enter(request, params={}):
-    return render_to_response('register.html', params,
-                              context_instance=RequestContext(request))
-
-def register(request, params={}):
-    measure = int(request.POST['measure'])
         
-    p = Power()
-    p.level = measure
-    if 'description' in request.POST:
-        p.description = request.POST['description']
-    p.save()
-    return HttpResponseRedirect('/')
+
+@login_required(login_url='/accounts/login/')
+def edit(request, power_id, params={}):
+    if request.method == 'POST':
+        power = Power.objects.get(pk=power_id)
+        form = PowerForm(request.POST, instance=power)
+        if form.is_valid(): # All validation rules pass
+            form.save()
+            return HttpResponseRedirect("/")
+    else:
+        if power_id:
+            power = Power.objects.get(pk=power_id)                
+            form = PowerForm(instance=power)
+            form.id = power_id 
+        else:
+            form = PowerForm()
+
+    return render(request, 'register.html', {
+        'sender': 'edit',
+        'form': form,
+        'power_id': power_id
+    })
+
+
+@login_required(login_url='/accounts/login/')
+def delete(request, power_id, params={}):
+    if request.method == 'POST':
+        power = Power.objects.get(pk=power_id)
+        power.delete()
+        print "Deleted %s " % power_id
+    return HttpResponseRedirect("/")
+
+
+@login_required(login_url='/accounts/login/')
+def register(request, params={}):
+    if request.method == 'POST':
+        form = PowerForm(request.POST) 
+        if form.is_valid(): # All validation rules pass
+            form.save()
+            return HttpResponseRedirect("/")
+    return index(request, params)
+
+
 
 def search_powers(q, params):
     res = {}
-    fltr = Power.objects.order_by('-updated_at')
-    # if q:
-    #    fltr = fltr.filter(identifier__startswith=q)
-
+    fltr = Power.objects.order_by('-created_at')
     paginator = Paginator(fltr, BATCH_SIZE)
     res['count'] = fltr.count()
     try:
@@ -57,6 +82,7 @@ def search_powers(q, params):
     except EmptyPage:
         res['powers'] = paginator.page(paginator.num_pages)
     return res
+
 
 def signout(request):
     logout(request)

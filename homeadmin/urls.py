@@ -9,12 +9,15 @@ urlpatterns = patterns('',
     url(r'^$', 'console.views.index', name='index'),
     url(r'^console/', 'console.views.index'),
     url(r'^index/', 'console.views.index'),
-    url(r'^enter/$', 'console.views.enter'),
     url(r'^register/$', 'console.views.register'),
+    url(r'^edit/(?P<power_id>.*)/$', 'console.views.edit'),
+    url(r'^delete/(?P<power_id>.*)/$', 'console.views.delete'),
     url(r'^signin/$', 'console.views.signin'),
     url(r'^signout/$', 'console.views.signout'),
     url(r'^admin/', include(admin.site.urls)),
+    (r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'registration/login.html'}),
 )
+
 
 if settings.DEBUG:
     urlpatterns += patterns('',

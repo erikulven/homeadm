@@ -1,0 +1,25 @@
+Power measure application built on:
+
+python 2.7
+django 1.5
+heroku
+
+
+
+Heroku commands:
+% sudo gem install heroku
+
+Getting started local:
+checkout and use foreman (rubygem) for simulating heroku
+
+% heroku login
+% heroku run python manage.py syncdb
+% heroku run ls -la
+
+running local with foreman:
+% foreman start
+
+
+Deploy:
+% git commit -a
+% git push heroku master
