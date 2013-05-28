@@ -12,5 +12,5 @@ class Power(models.Model):
     def __unicode__(self):
         return "%s: %s" % (self.level, self.description)
 
-    def consumed_per_day(self):
+    def daily_consume(self):
         return self.hourly_consume * 24 * 1.0
