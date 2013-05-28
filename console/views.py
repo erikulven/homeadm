@@ -1,6 +1,5 @@
 from console.models import Power
 from console.forms import PowerForm
-
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -14,6 +13,7 @@ import logging
 logger = logging.getLogger(__name__)
 BATCH_SIZE = 48
 
+
 # Create your views here.
 @login_required(login_url='/accounts/login/')
 def index(request, params={}):
@@ -25,21 +25,21 @@ def index(request, params={}):
     rparams['form'] = PowerForm()
     return render_to_response('index.html', rparams,
                               context_instance=RequestContext(request))
-        
+
 
 @login_required(login_url='/accounts/login/')
 def edit(request, power_id, params={}):
     if request.method == 'POST':
         power = Power.objects.get(pk=power_id)
         form = PowerForm(request.POST, instance=power)
-        if form.is_valid(): # All validation rules pass
+        if form.is_valid():  # All validation rules pass
             form.save()
             return HttpResponseRedirect("/")
     else:
         if power_id:
-            power = Power.objects.get(pk=power_id)                
+            power = Power.objects.get(pk=power_id)
             form = PowerForm(instance=power)
-            form.id = power_id 
+            form.id = power_id
         else:
             form = PowerForm()
 
@@ -62,12 +62,39 @@ def delete(request, power_id, params={}):
 @login_required(login_url='/accounts/login/')
 def register(request, params={}):
     if request.method == 'POST':
-        form = PowerForm(request.POST) 
-        if form.is_valid(): # All validation rules pass
+        form = PowerForm(request.POST)
+        if form.is_valid():  # All validation rules pass
             form.save()
             return HttpResponseRedirect("/")
     return index(request, params)
 
+
+@login_required(login_url='/accounts/login/')
+def recalculate(request, params={}):
+    prev = None
+    for p in Power.objects.order_by('created_at'):
+        if prev and p.level >= prev.level:
+            consume = p.level - prev.level
+            duration = p.created_at - prev.created_at
+            mins = duration.seconds % 3600 / 60
+            hours = (duration.seconds / 3600)
+            days = duration.days
+            if days:
+                hours += (days * 24)
+            if mins > 30:
+                hours += 1
+            if hours:
+                mins += (hours * 60)
+            if not hours:
+                hours = 1
+
+            print("Hours between: %s" % hours)
+            consume_per_hour = (consume + 0.0) / hours
+            p.hourly_consume = consume_per_hour
+            p.save()
+            print("Calculated consume per hour: %s" % (consume_per_hour))
+        prev = p
+    return index(request, params)
 
 
 def search_powers(q, params):
@@ -106,6 +133,7 @@ def signin(request):
         params['alert'] = "Failed signing in!"
 
     return index(request, params)
+
 
 def parse_param(request, name):
     q = ''
