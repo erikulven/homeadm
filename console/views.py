@@ -33,7 +33,9 @@ def edit(request, power_id, params={}):
         power = Power.objects.get(pk=power_id)
         form = PowerForm(request.POST, instance=power)
         if form.is_valid():  # All validation rules pass
+            prev = Power.objects.order_by('created_at')[0]
             form.save()
+            _calculate(prev, form.instance)
             return HttpResponseRedirect("/")
     else:
         if power_id:
@@ -64,7 +66,9 @@ def register(request, params={}):
     if request.method == 'POST':
         form = PowerForm(request.POST)
         if form.is_valid():  # All validation rules pass
+            prev = Power.objects.order_by('created_at')[0]
             form.save()
+            _calculate(prev, form.instance)
             return HttpResponseRedirect("/")
     return index(request, params)
 
@@ -73,29 +77,33 @@ def register(request, params={}):
 def recalculate(request, params={}):
     prev = None
     for p in Power.objects.order_by('created_at'):
-        if prev and p.level >= prev.level:
-            consume = p.level - prev.level
-            duration = p.created_at - prev.created_at
-            mins = duration.seconds % 3600 / 60
-            hours = (duration.seconds / 3600)
-            days = duration.days
-            if days:
-                hours += (days * 24)
-            if mins > 30:
-                hours += 1
-            if hours:
-                mins += (hours * 60)
-            if not hours:
-                hours = 1
-
-            print("Hours between: %s" % hours)
-            consume_per_hour = (consume + 0.0) / hours
-            p.hourly_consume = consume_per_hour
-            p.save()
-            print("Calculated consume per hour: %s" % (consume_per_hour))
+        _calculate(prev, p)
         prev = p
     return index(request, params)
 
+
+def _calculate(prev, current):
+    if prev and current and current.level >= prev.level:
+        consume = current.level - prev.level
+        duration = current.created_at - prev.created_at
+        mins = duration.seconds % 3600 / 60
+        hours = (duration.seconds / 3600)
+        days = duration.days
+        if days:
+            hours += (days * 24)
+        if mins > 30:
+            hours += 1
+        if hours:
+            mins += (hours * 60)
+        if not hours:
+            hours = 1
+
+        print("Hours between: %s" % hours)
+        consume_per_hour = (consume + 0.0) / hours
+        current.hourly_consume = consume_per_hour
+        current.save()
+        print("Calculated consume per hour: %s" % (consume_per_hour))
+    
 
 def search_powers(q, params):
     res = {}
