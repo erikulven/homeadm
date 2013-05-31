@@ -14,8 +14,8 @@
     <tr>
       <th class="span2">Dato</th>
       <th class="span2">Verdi</th>
-      <th class="span8">Timesforbruk</th>
-      <th class="span8">D&oslash;gnforbruk</th>
+      <th class="span8">Time</th>
+      <th class="span8">D&oslash;gn</th>
       <th class="span8">Kommentar</th>
     </tr>
   </thead>
@@ -24,8 +24,8 @@
         <tr>
             <td nowrap="nowrap"><a href="/edit/{{ item.id }}/">{{ item.created_at|date:'Y-m-d H:i:s' }}</a></td>
             <td nowrap="nowrap"><a href="/edit/{{ item.id }}/">{{ item.level }}</a></td>
-            <td >{{ item.hourly_consume }}</td>
-            <td >{{ item.daily_consume }}</td>
+            <td >{{ item.hourly_consume|floatformat:2 }}</td>
+            <td >{{ item.daily_consume|floatformat:2 }}</td>
             <td >{{ item.description }}</td>
         </tr>
        {% endfor %}
