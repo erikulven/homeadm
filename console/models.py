@@ -14,3 +14,9 @@ class Power(models.Model):
 
     def daily_consume(self):
         return self.hourly_consume * 24 * 1.0
+
+    def monthly_consume(self):
+        return self.daily_consume() * 31 * 1.0
+
+    def yearly_consume(self):
+        return self.daily_consume() * 365 * 1.0

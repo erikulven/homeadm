@@ -33,7 +33,7 @@ def edit(request, power_id, params={}):
         power = Power.objects.get(pk=power_id)
         form = PowerForm(request.POST, instance=power)
         if form.is_valid():  # All validation rules pass
-            prev = Power.objects.filter(id__lt=form.instance.id).order_by('created_at')[0]
+            prev = Power.objects.filter(id__lt=form.instance.id).order_by('-created_at')[0]
             form.save()
             _calculate(prev, form.instance)
             return HttpResponseRedirect("/")
@@ -66,7 +66,7 @@ def register(request, params={}):
     if request.method == 'POST':
         form = PowerForm(request.POST)
         if form.is_valid():  # All validation rules pass
-            prev = Power.objects.order_by('created_at')[0]
+            prev = Power.objects.order_by('-created_at')[0]
             form.save()
             _calculate(prev, form.instance)
             return HttpResponseRedirect("/")
