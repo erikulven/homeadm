@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h6>Legg inn m&aring;leverdi</h6>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% include 'register_form.html' %}
+
+<form class="form-vertical" action="/delete/{{ form.id }}/" method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger  pull-left">Slett</button>
+</form>
+
+
+{% endblock %}

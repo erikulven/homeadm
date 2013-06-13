@@ -1,0 +1,13 @@
+body {
+    padding-top: 50px;
+}
+
+.thumbnail_dimension {
+  height: 200px;
+  width: 200px;
+}
+
+.centered {
+  float:none;
+  margin:0 auto;
+}

@@ -1,0 +1,18 @@
+{% if form.id %}
+<form class="well form-vertical" action="/edit/{{ form.id }}/" method="post">
+{% else %}
+<form class="well form-vertical" action="/register/" method="post">
+{% endif  %}
+    {% csrf_token %}
+    <legend>Måling</legend>
+    <div class="lightblue">
+      {{ form.name.errors }}
+      <label for="id_level">Nivå:</label>
+      {{ form.level }}
+      {{ form.description.errors }}
+      <label for="id_description">Description:</label>
+      {{ form.description }}
+    </div>
+    <button type="submit" class="btn btn-primary pull-left">Lagre</button>
+    <br/>
+</form>

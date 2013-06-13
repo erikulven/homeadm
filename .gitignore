@@ -1,0 +1,6 @@
+venv
+*.pyc
+.project
+.pydevproject
+~
+static_assets
